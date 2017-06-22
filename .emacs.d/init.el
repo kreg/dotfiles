@@ -173,6 +173,14 @@
   (setq grep-find-ignored-directories (append grep-find-ignored-directories '("deb_dist"  "dist" "build")))
   (setq grep-find-ignored-files (append grep-find-ignored-files '("*.gz" "*.deb"))))
 
+(use-package groovy-mode
+  :ensure t
+  :config
+  (add-hook 'groovy-mode-hook
+            (lambda ()
+              (setq c-basic-offset 4),
+	            (c-set-offset 'label 4))))
+
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer)))        ; instead of list-buffers
 
