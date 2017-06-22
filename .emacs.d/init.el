@@ -178,8 +178,8 @@
   :config
   (add-hook 'groovy-mode-hook
             (lambda ()
-              (setq c-basic-offset 4),
-	            (c-set-offset 'label 4))))
+              (setq c-basic-offset 4)
+              (c-set-offset 'label 4))))
 
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer)))        ; instead of list-buffers
