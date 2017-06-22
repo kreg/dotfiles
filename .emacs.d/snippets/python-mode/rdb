@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+# name: rdb
+# contributor: Craig McDaniel
+# --
+from remote_pdb import RemotePdb; RemotePdb(host='0.0.0.0', port=0).set_trace()

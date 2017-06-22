@@ -1,0 +1,10 @@
+# -*- encoding: utf-8 -*-
+#
+# `(file-name-nondirectory (buffer-file-name))`
+#
+# Description:
+#       ${1:}
+#
+# Protection Notice:
+#       Copyright (c) `(format-time-string "%Y")`, Racemi, Inc.  All rights reserved.
+#

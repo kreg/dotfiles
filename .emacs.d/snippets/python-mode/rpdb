@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+# name: rpdb
+# contributor: Craig McDaniel
+# --
+import sys, pdb; pdb.Pdb(stdout=sys.__stdout__).set_trace()

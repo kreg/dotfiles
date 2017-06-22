@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+# name: crdb
+# contributor: Craig McDaniel
+# --
+from celery.contrib import rdb; rdb.set_trace()
