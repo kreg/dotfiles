@@ -279,8 +279,8 @@
 (use-package window
   :bind (([up] . scroll-down-line)      ; already have C-p for previous-line
          ([down] . scroll-up-line))     ; already have C-n for next-line
-  :config
-  (setq split-height-threshold nil)
+  :init
+  (setq split-height-threshold nil)     ; these had to be in :init instead of :config for some reason
   (setq split-width-threshold 220))
 
 (use-package yasnippet
