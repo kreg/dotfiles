@@ -46,7 +46,7 @@
 
 ;; variables and settings not in any package; in C-source code
 (set-fontset-font t 'unicode "Apple Color Emoji" nil 'prepend)
-(set-fill-column 72)
+(set-fill-column 110)
 (tool-bar-mode -1)
 (setq-default indent-tabs-mode nil)
 (setq-default indicate-buffer-boundaries 'left)
@@ -227,7 +227,7 @@
   (defun my-python-hook()
     (setq python-indent-guess-indent-offset nil)
     (setq python-check-command "~/virtualenvs/emacs/bin/flake8 --max-line-length=110")
-    (set-fill-column 72)
+    (set-fill-column 110)
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
     (setenv "LANG" "en_US.UTF-8"))
   (add-hook 'python-mode-hook 'my-python-hook))
