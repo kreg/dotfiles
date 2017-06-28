@@ -46,8 +46,8 @@
 
 ;; variables and settings not in any package; in C-source code
 (set-fontset-font t 'unicode "Apple Color Emoji" nil 'prepend)
-(set-fill-column 110)
 (tool-bar-mode -1)
+(setq-default fill-column 110)
 (setq-default indent-tabs-mode nil)
 (setq-default indicate-buffer-boundaries 'left)
 (setq-default indicate-empty-lines t)
