@@ -168,9 +168,13 @@
   (set-cursor-color "tomato1")
   (setq blink-cursor-mode nil))
 
+(use-package git-timemachine
+  :ensure t
+  )
+
 (use-package grep
   :config
-  (setq grep-find-ignored-directories (append grep-find-ignored-directories '("deb_dist"  "dist" "build")))
+  (setq grep-find-ignored-directories (append grep-find-ignored-directories '("deb_dist"  "dist" "build" "*venv*")))
   (setq grep-find-ignored-files (append grep-find-ignored-files '("*.gz" "*.deb"))))
 
 (use-package groovy-mode
@@ -286,4 +290,4 @@
 (use-package yasnippet
   :ensure t
   :config
-  (yas-global-mode 1))  
+  (yas-global-mode 1))
