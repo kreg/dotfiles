@@ -24,6 +24,13 @@
 (global-unset-key "\C-x\C-z")           ; don't use this key to minimize
 (global-unset-key (kbd "s-p"))          ; don't use this key to print
 
+;; Use OSX-style super keys in terminals too. Requires mapping them in
+;; terminal emulator as well.
+(unless (display-graphic-p)
+  (progn
+    (global-set-key (kbd "s-u") 'revert-buffer)
+    (global-set-key (kbd "s-l") 'goto-line)))
+
 ;; replace y-e-s by y
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -45,9 +52,12 @@
 
 
 ;; variables and settings not in any package; in C-source code
-(set-fontset-font t 'unicode "Apple Color Emoji" nil 'prepend)
-(tool-bar-mode -1)
-(setq-default fill-column 110)
+(if (display-graphic-p)
+    (progn
+      (set-fontset-font t 'unicode "Apple Color Emoji" nil 'prepend)
+      (tool-bar-mode -1))
+  (menu-bar-mode -1))
+
 (setq-default indent-tabs-mode nil)
 (setq-default indicate-buffer-boundaries 'left)
 (setq-default indicate-empty-lines t)
@@ -134,7 +144,8 @@
   :config
   (setq auto-save-default nil)
   (setq confirm-kill-emacs 'y-or-n-p)
-  (setq insert-directory-program "/usr/local/bin/gls") ; use gnu ls which supports --dired
+  (when (eq system-type 'darwin)
+    (setq insert-directory-program "/usr/local/bin/gls")) ; use gnu ls which supports --dired
   (setq make-backup-files nil)
   (setq require-final-newline t)
   (setq safe-local-variable-values '((encoding . utf-8))))
@@ -220,14 +231,12 @@
 
 (use-package python
   :bind (:map python-mode-map
-              ("C-m" . sp-newline)
               ("s-[" . python-indent-shift-left)
               ("s-]" . python-indent-shift-right))
   :config
   (defun my-python-hook()
     (setq python-indent-guess-indent-offset nil)
     (setq python-check-command "~/virtualenvs/emacs/bin/flake8 --max-line-length=110")
-    (set-fill-column 110)
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
     (setenv "LANG" "en_US.UTF-8"))
   (add-hook 'python-mode-hook 'my-python-hook))
@@ -249,6 +258,7 @@
   :config
   (setq column-number-mode t)
   (setq kill-whole-line t)
+  (setq shift-select-mode nil)
   (setq size-indication-mode t))
 
 (use-package smartparens
@@ -273,7 +283,7 @@
 (use-package windmove
   :ensure t
   :config
-  (windmove-default-keybindings 'super)
+  (windmove-default-keybindings)        ; shifted arrow keys
   (setq windmove-wrap-around t))
 
 (use-package window
@@ -286,4 +296,4 @@
 (use-package yasnippet
   :ensure t
   :config
-  (yas-global-mode 1))  
+  (yas-global-mode 1))
