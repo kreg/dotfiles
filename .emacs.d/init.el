@@ -89,6 +89,7 @@
   (add-hook 'prog-mode-hook '(lambda() (add-hook 'before-save-hook 'copyright-update))))
 
 (use-package cua-base
+  :bind (("M-RET" . cua-rectangle-mark-mode))
   :config
   (setq cua-enable-cua-keys nil)             ; only used for rectangle editing
   (cua-mode t))
