@@ -71,6 +71,10 @@
   :bind (("M-i" . ace-jump-mode)
          ("s-i" . ace-jump-mode-pop-mark)))
 
+(use-package ace-window
+  :ensure t
+  :bind (("M-p" . ace-window)))
+
 (use-package company
   :ensure t
   :config
@@ -97,6 +101,9 @@
 (use-package desktop
   :config
   (setq desktop-save-mode t))
+
+(use-package dockerfile-mode
+  :ensure t)
 
 (use-package ediff
   :config
@@ -155,7 +162,7 @@
   :ensure t
   :config
   (setq flycheck-emacs-lisp-load-path 'inherit)
-  (setq flycheck-python-flake8-executable "~/virtualenvs/emacs/bin/flake8")
+  (setq flycheck-python-flake8-executable "~/.virtualenvs/emacs/bin/flake8")
   (setq-default flycheck-flake8-maximum-line-length 110)
   (add-hook 'elisp-mode-hook 'flycheck-mode)
   (add-hook 'ruby-mode-hook 'flycheck-mode)
@@ -219,7 +226,7 @@
 (use-package markdown-mode
   :ensure t
   :config
-  (setq markdown-command "~/virtualenvs/emacs/bin/markdown_py -x mdx_gfm"))
+  (setq markdown-command "~/.virtualenvs/emacs/bin/markdown_py -x mdx_gfm"))
 
 (use-package material-theme
   :ensure t
@@ -237,7 +244,7 @@
   :config
   (defun my-python-hook()
     (setq python-indent-guess-indent-offset nil)
-    (setq python-check-command "~/virtualenvs/emacs/bin/flake8 --max-line-length=110")
+    (setq python-check-command "~/.virtualenvs/emacs/bin/flake8 --max-line-length=110")
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
     (setenv "LANG" "en_US.UTF-8"))
   (add-hook 'python-mode-hook 'my-python-hook))
@@ -246,6 +253,9 @@
   :ensure t
   :config
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+(use-package replace
+  :bind (([f5] . query-replace-regexp)))
 
 (use-package scroll-bar
   :config
