@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+# name: ipdb
+# contributor: Craig McDaniel
+# --
+import ipdb; ipdb.set_trace()

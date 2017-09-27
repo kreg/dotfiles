@@ -237,6 +237,10 @@
   :config
   (setq nxml-slash-auto-complete-flag t))
 
+(use-package projectile
+  :ensure t
+  :bind (([f8] . projectile-grep)))
+
 (use-package python
   :bind (:map python-mode-map
               ("s-[" . python-indent-shift-left)
