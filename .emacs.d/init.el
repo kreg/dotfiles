@@ -239,7 +239,7 @@
 
 (use-package projectile
   :ensure t
-  :bind (([f8] . projectile-grep)))
+  :bind (([f7] . projectile-grep)))
 
 (use-package python
   :bind (:map python-mode-map
