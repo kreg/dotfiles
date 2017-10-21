@@ -50,8 +50,8 @@
   (switch-to-buffer (get-buffer-create "*scratch*"))
   (lisp-interaction-mode))
 
-
-;; variables and settings not in any package; in C-source code
+;
+; variables and settings not in any package; in C-source code
 (if (display-graphic-p)
     (progn
       (set-fontset-font t 'unicode "Apple Color Emoji" nil 'prepend)
@@ -77,16 +77,13 @@
 
 (use-package company
   :ensure t
-  :config
-  (add-hook 'python-mode-hook
-            '(lambda()
-               (company-mode)
-               (add-to-list 'company-backends 'company-jedi)
-               (local-set-key (kbd "C-M-i") 'company-complete))))
+  :bind (("C-M-i" . company-complete)))
+
+(use-package company-go
+  :ensure t)
 
 (use-package company-jedi
-  :ensure t
-  )
+  :ensure t)
 
 (use-package copyright
   :config
@@ -168,6 +165,17 @@
   (add-hook 'ruby-mode-hook 'flycheck-mode)
   (add-hook 'python-mode-hook 'flycheck-mode))
 
+(use-package flycheck-gometalinter
+  :ensure t
+  :after go-mode
+  :config
+  (eval-after-load 'flycheck
+    '(add-hook 'flycheck-mode-hook #'flycheck-gometalinter-setup))
+  (setq flycheck-gometalinter-vendor t)
+  (setq flycheck-gometalinter-fast t)
+  (setq flycheck-gometalinter-tests t)
+  (add-hook 'go-mode-hook #'flycheck-mode))
+
 (use-package flx
   :ensure t
   :init
@@ -186,6 +194,36 @@
   :config
   (set-cursor-color "tomato1")
   (setq blink-cursor-mode nil))
+
+(use-package go-mode
+  :ensure t
+  :config
+  (setq gofmt-command "goimports")
+  (use-package go-dlv :ensure t)
+  (use-package go-impl :ensure t)
+  (use-package go-rename :ensure t)
+  (use-package go-guru
+    :ensure t
+    :config
+    (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode))
+  (add-hook 'go-mode-hook (lambda()
+                            (company-mode)
+                            (add-to-list 'company-backends 'company-go)
+                            (setq tab-width 4)
+                            (add-hook 'before-save-hook #'gofmt-before-save nil 'local)
+	                    (set (make-local-variable 'compile-command) (concat go-command " run *.go"))))
+  :bind (("C-c C-r" . go-remove-unused-imports)
+         ("C-c C-k" . godoc)))
+
+(use-package go-eldoc
+  :after go-mode
+  :ensure t
+  :config
+  (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+(use-package go-playground
+  :ensure t
+  :bind (("C-c C-c" . go-playground-exec)))
 
 (use-package grep
   :config
@@ -233,6 +271,45 @@
   :config
   (load-theme 'material t))
 
+(defun multi-term-split-window-right ()
+  (interactive)
+  (split-window-right)
+  (other-window 1)
+  (multi-term))
+
+(defun multi-term-split-window-below ()
+  (interactive)
+  (split-window-below)
+  (other-window 1)
+  (multi-term))
+
+(use-package multi-term
+  :ensure t
+  :config
+  (setq term-unbind-key-list '("C-x" "C-c" "C-h" "C-y" "<ESC>"))
+  (setq term-bind-key-alist '(
+    ("C-c C-c" . term-interrupt-subjob)
+    ("C-c C-e" . term-send-esc)
+    ("C-c C-k" . term-char-mode)
+    ("C-c C-j" . term-line-mode)
+    ("C-p" . term-send-up)
+    ("C-n" . term-send-down)
+    ("C-m" . term-send-return)
+    ("C-y" . term-paste)
+    ("M-f" . term-send-forward-word)
+    ("M-b" . term-send-backward-word)
+    ("M-o" . term-send-backspace)
+    ("M-p" . term-send-up)
+    ("M-n" . term-send-down)
+    ("M-M" . term-send-forward-kill-word)
+    ("M-N" . term-send-backward-kill-word)
+    ("<C-backspace>" . term-send-backward-kill-word)
+    ("M-r" . term-send-reverse-search-history)
+    ("M-d" . term-send-delete-word)
+    ("M-," . term-send-raw)
+    ("C-c 2" . multi-term-split-window-below)
+    ("C-c 3" . multi-term-split-window-right))))
+
 (use-package nxml-mode
   :config
   (setq nxml-slash-auto-complete-flag t))
@@ -250,7 +327,9 @@
     (setq python-indent-guess-indent-offset nil)
     (setq python-check-command "~/.virtualenvs/emacs/bin/flake8 --max-line-length=110")
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
-    (setenv "LANG" "en_US.UTF-8"))
+    (setenv "LANG" "en_US.UTF-8")
+    (company-mode)
+    (add-to-list 'company-backends 'company-jedi))
   (add-hook 'python-mode-hook 'my-python-hook))
 
 (use-package rainbow-delimiters
@@ -312,3 +391,6 @@
   :ensure t
   :config
   (yas-global-mode 1))
+
+(use-package zoom-window
+  :ensure t)
