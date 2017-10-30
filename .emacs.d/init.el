@@ -50,8 +50,12 @@
   (switch-to-buffer (get-buffer-create "*scratch*"))
   (lisp-interaction-mode))
 
-;
-; variables and settings not in any package; in C-source code
+(defun now ()
+  "Insert string for the current time formatted like '2:34 PM'."
+  (interactive)                 ; permit invocation in minibuffer
+  (insert (format-time-string "%D %-I:%M %p")))
+
+;; variables and settings not in any package; in C-source code
 (if (display-graphic-p)
     (progn
       (set-fontset-font t 'unicode "Apple Color Emoji" nil 'prepend)
@@ -231,8 +235,8 @@
 
 (use-package grep
   :config
-  (setq grep-find-ignored-directories (append grep-find-ignored-directories '("deb_dist"  "dist" "build" "*venv*")))
-  (setq grep-find-ignored-files (append grep-find-ignored-files '("*.gz" "*.deb"))))
+  (setq grep-find-ignored-directories (append grep-find-ignored-directories '("deb_dist"  "dist" "build" "*venv*" "system_test/report" "pb-python" "protocol")))
+  (setq grep-find-ignored-files (append grep-find-ignored-files '("*.gz" "*.deb" "*.vox" "*.hdf5" "*.pkl" "*.pdf" "*.pcap" "*.npz" "collector" "predictor"))))
 
 (use-package groovy-mode
   :ensure t
