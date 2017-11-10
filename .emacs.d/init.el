@@ -206,6 +206,9 @@
 (use-package go-mode
   :ensure t
   :config
+  (when (eq system-type 'darwin)
+    (setenv "GOROOT" "/usr/local/opt/go/libexec")
+    (setenv "GOPATH" "/Users/cmcdaniel/go"))
   (setq gofmt-command "goimports")
   (use-package go-dlv :ensure t)
   (use-package go-impl :ensure t)
@@ -325,6 +328,15 @@
 (use-package projectile
   :ensure t
   :bind (([f7] . projectile-grep)))
+
+(use-package protobuf-mode
+  :ensure t
+  :config
+  (defconst my-protobuf-style
+    '((c-basic-offset . 4)
+      (indent-tabs-mode . nil)))
+  (add-hook 'protobuf-mode-hook
+            (lambda () (c-add-style "my-style" my-protobuf-style t))))
 
 (use-package python
   :bind (:map python-mode-map
