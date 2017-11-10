@@ -325,10 +325,6 @@
   :config
   (setq nxml-slash-auto-complete-flag t))
 
-(use-package projectile
-  :ensure t
-  :bind (([f7] . projectile-grep)))
-
 (use-package protobuf-mode
   :ensure t
   :config
