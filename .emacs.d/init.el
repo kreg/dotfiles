@@ -79,6 +79,30 @@
   :ensure t
   :bind (("M-p" . ace-window)))
 
+(use-package ag
+  :ensure t
+  :config
+  (setq ag-arguments (append ag-arguments '("--ignore=deb_dist"
+                                            "--ignore=dist"
+                                            "--ignore=build"
+                                            "--ignore=*venv*"
+                                            "--ignore=system_test/report"
+                                            "--ignore=pb-python"
+                                            "--ignore=protocol"
+                                            "--ignore=lcov-report"
+                                            "--ignore=*.gz"
+                                            "--ignore=*.deb"
+                                            "--ignore=*.vox"
+                                            "--ignore=*.hdf5"
+                                            "--ignore=*.pkl"
+                                            "--ignore=*.pdf"
+                                            "--ignore=*.pcap"
+                                            "--ignore=*.npz"
+                                            "--ignore=passport_trials"
+                                            "--ignore=datascience-toolbox"
+                                            "--ignore=collector"
+                                            "--ignore=predictor"))))
+
 (use-package company
   :ensure t
   :bind (("C-M-i" . company-complete)))
@@ -238,7 +262,16 @@
 
 (use-package grep
   :config
-  (setq grep-find-ignored-directories (append grep-find-ignored-directories '("deb_dist"  "dist" "build" "*venv*" "system_test/report" "pb-python" "protocol")))
+  (setq grep-find-ignored-directories (append grep-find-ignored-directories '("deb_dist"
+                                                                              "dist"
+                                                                              "build"
+                                                                              "*venv*"
+                                                                              "system_test/report"
+                                                                              "pb-python"
+                                                                              "protocol"
+                                                                              "passport_trials"
+                                                                              "datascience_toolbox"
+                                                                              "lcov-report")))
   (setq grep-find-ignored-files (append grep-find-ignored-files '("*.gz" "*.deb" "*.vox" "*.hdf5" "*.pkl" "*.pdf" "*.pcap" "*.npz" "collector" "predictor"))))
 
 (use-package groovy-mode
