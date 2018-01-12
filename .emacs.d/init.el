@@ -99,9 +99,8 @@
                                             "--ignore=*.pcap"
                                             "--ignore=*.npz"
                                             "--ignore=passport_trials"
-                                            "--ignore=datascience-toolbox"
-                                            "--ignore=collector"
-                                            "--ignore=predictor"))))
+                                            "--ignore=datascience-toolbox")))
+  (setq ag-reuse-buffers t))
 
 (use-package company
   :ensure t
@@ -118,7 +117,6 @@
   (add-hook 'prog-mode-hook '(lambda() (add-hook 'before-save-hook 'copyright-update))))
 
 (use-package cua-base
-  :bind (("M-RET" . cua-rectangle-mark-mode))
   :config
   (setq cua-enable-cua-keys nil)             ; only used for rectangle editing
   (cua-mode t))
@@ -281,6 +279,13 @@
             (lambda ()
               (setq c-basic-offset 4)
               (c-set-offset 'label 4))))
+
+;; (use-package helm
+;;   :ensure t
+;;   :config
+;;   (require 'helm-config)
+;;   (helm-mode 1)
+;;   (setq helm-mode-fuzzy-match t))
 
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer)))        ; instead of list-buffers
