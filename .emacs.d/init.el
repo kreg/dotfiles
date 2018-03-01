@@ -67,6 +67,12 @@
 (setq-default indicate-empty-lines t)
 (setq-default scroll-conservatively 1)
 (setq-default scroll-preserve-screen-position 1)
+(setq ring-bell-function 'ignore)
+
+;; don't create temporary files or symlinks
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
 
 ;; packages
 
@@ -114,7 +120,9 @@
 
 (use-package copyright
   :config
-  (add-hook 'prog-mode-hook '(lambda() (add-hook 'before-save-hook 'copyright-update))))
+  (setq copyright-year-ranges t)
+  (add-hook 'prog-mode-hook
+            '(lambda() (add-hook 'before-save-hook 'copyright-update))))
 
 (use-package cua-base
   :config
@@ -131,18 +139,16 @@
 (use-package ediff
   :config
   (defun local-ediff-before-setup-hook ()
-    (setq local-ediff-saved-frame-configuration (current-frame-configuration))
     (setq local-ediff-saved-window-configuration (current-window-configuration)))
   (defun local-ediff-quit-hook ()
-    (set-frame-configuration local-ediff-saved-frame-configuration)
     (set-window-configuration local-ediff-saved-window-configuration))
   (defun local-ediff-suspend-hook ()
-    (set-frame-configuration local-ediff-saved-frame-configuration)
     (set-window-configuration local-ediff-saved-window-configuration))
   (add-hook 'ediff-before-setup-hook 'local-ediff-before-setup-hook)
   (add-hook 'ediff-quit-hook 'local-ediff-quit-hook 'append)
   (add-hook 'ediff-suspend-hook 'local-ediff-suspend-hook 'append)
-  (setq ediff-split-window-function 'split-window-horizontally))
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
 (use-package edit-server
   :ensure t
@@ -177,9 +183,11 @@
   (setq confirm-kill-emacs 'y-or-n-p)
   (when (eq system-type 'darwin)
     (setq insert-directory-program "/usr/local/bin/gls")) ; use gnu ls which supports --dired
-  (setq make-backup-files nil)
   (setq require-final-newline t)
-  (setq safe-local-variable-values '((encoding . utf-8))))
+  (setq safe-local-variable-values
+        '((encoding . utf-8)
+          (python-check-command . "~/.virtualenvs/emacs-python3/bin/flake8 --max-line-length=110")
+          (flycheck-python-flake8-executable . "~/.virtualenvs/emacs-python3/bin/flake8"))))
 
 (use-package flycheck
   :ensure t
@@ -446,5 +454,19 @@
   :config
   (yas-global-mode 1))
 
+(use-package yasnippet-snippets
+  :ensure t)
+
 (use-package zoom-window
   :ensure t)
+
+(eval-and-compile
+  (defun markdown-preview-load-path ()
+    (concat (getenv "HOME") "/src/markdown-preview/")))
+
+(use-package markdown-preview
+  :load-path (lambda () (list (markdown-preview-load-path))))
+
+(defun safe-local-variable-p (sym val)
+  "Put your guard logic here, return t when sym is ok, nil otherwise"
+  (member sym '(flycheck-python-flake8-executable python-check-command encoding)))
