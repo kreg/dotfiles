@@ -67,12 +67,23 @@
 (setq-default indicate-empty-lines t)
 (setq-default scroll-conservatively 1)
 (setq-default scroll-preserve-screen-position 1)
+(setq-default fill-column 110)
 (setq ring-bell-function 'ignore)
 
 ;; don't create temporary files or symlinks
 (setq make-backup-files nil)
 (setq auto-save-default nil)
 (setq create-lockfiles nil)
+
+
+;; custom local packages
+(eval-and-compile
+  (defun markdown-preview-load-path ()
+    (concat (getenv "HOME") "/src/markdown-preview/")))
+
+(eval-and-compile
+  (defun godoctor-load-path ()
+    (concat (getenv "HOME") "/src/godoctor.el/")))
 
 ;; packages
 
@@ -233,6 +244,9 @@
   :ensure t
   )
 
+(use-package go-dlv
+  :ensure t)
+
 (use-package go-mode
   :ensure t
   :config
@@ -240,13 +254,14 @@
     (setenv "GOROOT" "/usr/local/opt/go/libexec")
     (setenv "GOPATH" "/Users/cmcdaniel/go"))
   (setq gofmt-command "goimports")
+  (setq gofmt-args '("-local" "github.atl.pdrop.net"))
   (use-package go-dlv :ensure t)
-  (use-package go-impl :ensure t)
   (use-package go-rename :ensure t)
   (use-package go-guru
     :ensure t
     :config
     (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode))
+  (setq go-guru-build-tags '("servicetest" "service"))
   (add-hook 'go-mode-hook (lambda()
                             (company-mode)
                             (add-to-list 'company-backends 'company-go)
@@ -256,6 +271,9 @@
   :bind (("C-c C-r" . go-remove-unused-imports)
          ("C-c C-k" . godoc)))
 
+(use-package godoctor
+  :load-path (lambda () (list (godoctor-load-path))))
+
 (use-package go-eldoc
   :after go-mode
   :ensure t
@@ -263,8 +281,7 @@
   (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (use-package go-playground
-  :ensure t
-  :bind (("C-c C-c" . go-playground-exec)))
+  :ensure t)
 
 (use-package grep
   :config
@@ -276,9 +293,9 @@
                                                                               "pb-python"
                                                                               "protocol"
                                                                               "passport_trials"
-                                                                              "datascience_toolbox"
+                                                                              "datascience-toolbox"
                                                                               "lcov-report")))
-  (setq grep-find-ignored-files (append grep-find-ignored-files '("*.gz" "*.deb" "*.vox" "*.hdf5" "*.pkl" "*.pdf" "*.pcap" "*.npz" "collector" "predictor"))))
+  (setq grep-find-ignored-files (append grep-find-ignored-files '("*.gz" "*.deb" "*.vox" "*.hdf5" "*.pkl" "*.pdf" "*.pcap" "*.npz" "collector" "predictor" "bigBlacklistConfig.json" "bigWhitelistConfig.json"))))
 
 (use-package groovy-mode
   :ensure t
@@ -322,6 +339,9 @@
   :ensure t
   :config
   (setq markdown-command "~/.virtualenvs/emacs/bin/markdown_py -x mdx_gfm"))
+
+(use-package markdown-preview
+  :load-path (lambda () (list (markdown-preview-load-path))))
 
 (use-package material-theme
   :ensure t
@@ -371,6 +391,17 @@
   :config
   (setq nxml-slash-auto-complete-flag t))
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)))
+
+(use-package ob-restclient
+  :ensure t
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t))))
+
 (use-package protobuf-mode
   :ensure t
   :config
@@ -401,6 +432,29 @@
 
 (use-package replace
   :bind (([f5] . query-replace-regexp)))
+
+(use-package restclient
+  :ensure t)
+
+(use-package rust-mode
+  :ensure t
+  :config
+  (setq rust-format-on-save t))
+
+(use-package cargo
+  :ensure t
+  :after (rust-mode))
+
+(use-package rust-playground
+  :ensure t
+  :after (rust-mode))
+
+(use-package flycheck-rust
+  :ensure t
+  :after (flycheck rust-mode)
+  :config
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+  (add-hook 'rust-mode-hook #'flycheck-mode))
 
 (use-package scroll-bar
   :config
@@ -459,13 +513,6 @@
 
 (use-package zoom-window
   :ensure t)
-
-(eval-and-compile
-  (defun markdown-preview-load-path ()
-    (concat (getenv "HOME") "/src/markdown-preview/")))
-
-(use-package markdown-preview
-  :load-path (lambda () (list (markdown-preview-load-path))))
 
 (defun safe-local-variable-p (sym val)
   "Put your guard logic here, return t when sym is ok, nil otherwise"
