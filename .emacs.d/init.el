@@ -85,6 +85,10 @@
   (defun godoctor-load-path ()
     (concat (getenv "HOME") "/src/godoctor.el/")))
 
+(eval-and-compile
+  (defun pdrestclient-load-path ()
+    (concat (getenv "HOME") "/src/pdrestclient.el/")))
+
 ;; packages
 
 (use-package ace-jump-mode
@@ -96,28 +100,10 @@
   :ensure t
   :bind (("M-p" . ace-window)))
 
-(use-package ag
+(use-package beacon
   :ensure t
   :config
-  (setq ag-arguments (append ag-arguments '("--ignore=deb_dist"
-                                            "--ignore=dist"
-                                            "--ignore=build"
-                                            "--ignore=*venv*"
-                                            "--ignore=system_test/report"
-                                            "--ignore=pb-python"
-                                            "--ignore=protocol"
-                                            "--ignore=lcov-report"
-                                            "--ignore=*.gz"
-                                            "--ignore=*.deb"
-                                            "--ignore=*.vox"
-                                            "--ignore=*.hdf5"
-                                            "--ignore=*.pkl"
-                                            "--ignore=*.pdf"
-                                            "--ignore=*.pcap"
-                                            "--ignore=*.npz"
-                                            "--ignore=passport_trials"
-                                            "--ignore=datascience-toolbox")))
-  (setq ag-reuse-buffers t))
+  (beacon-mode 1))
 
 (use-package company
   :ensure t
@@ -183,6 +169,9 @@
 (use-package face-remap
   :bind (("s-=" . text-scale-increase)
          ("s--" . text-scale-decrease)))
+
+(use-package ein
+  :ensure t)
 
 (use-package elisp-mode
   :config
@@ -305,6 +294,13 @@
               (setq c-basic-offset 4)
               (c-set-offset 'label 4))))
 
+(use-package hl-line
+  :config
+  (global-hl-line-mode))
+
+(use-package ht
+  :ensure t)
+
 ;; (use-package helm
 ;;   :ensure t
 ;;   :config
@@ -402,6 +398,22 @@
    'org-babel-load-languages
    '((restclient . t))))
 
+(defun my-babel-to-buffer ()
+  (interactive)
+  (org-open-at-point)
+  (org-babel-remove-result))
+
+(use-package ob
+  :bind (:map org-babel-map
+              ("\C-k" . org-babel-remove-result)
+              ("k" . org-babel-remove-result)
+              ("\C-m" . my-babel-to-buffer)
+              ("m" . my-babel-to-buffer)))
+
+(use-package pdrestclient
+  :config (load "~/src/pdrestclient.el.tokens/tokens.el" 'noerror)
+  :load-path (lambda () (list (pdrestclient-load-path))))
+
 (use-package protobuf-mode
   :ensure t
   :config
@@ -444,6 +456,11 @@
 (use-package cargo
   :ensure t
   :after (rust-mode))
+
+(use-package rg
+  :ensure t
+  :config
+  (rg-enable-default-bindings))
 
 (use-package rust-playground
   :ensure t
@@ -493,8 +510,13 @@
 (use-package windmove
   :ensure t
   :config
-  (windmove-default-keybindings)        ; shifted arrow keys
-  (setq windmove-wrap-around t))
+  (setq windmove-wrap-around t)
+
+  ;; match iTerm2 bindings
+  :bind (([M-s-left] . windmove-left)
+         ([M-s-right] . windmove-right)
+         ([M-s-up] . windmove-up)
+         ([M-s-down] . windmove-down)))
 
 (use-package window
   :bind (([up] . scroll-down-line)      ; already have C-p for previous-line
@@ -516,4 +538,4 @@
 
 (defun safe-local-variable-p (sym val)
   "Put your guard logic here, return t when sym is ok, nil otherwise"
-  (member sym '(flycheck-python-flake8-executable python-check-command encoding)))
+  (member sym '(flycheck-python-flake8-executable python-check-command encoding org-confirm-babel-evaluate)))
