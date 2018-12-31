@@ -503,6 +503,10 @@
          ([f8] . smex)
          ("M-X" . smex-major-mode-commands)))
 
+(use-package time
+  :config
+  (display-time-mode 1))
+
 (use-package uniquify
   :config
   (setq uniquify-buffer-name-style 'forward))
@@ -529,6 +533,9 @@
   :ensure t
   :config
   (yas-global-mode 1))
+
+(use-package yaml-mode
+  :ensure t)
 
 (use-package yasnippet-snippets
   :ensure t)
