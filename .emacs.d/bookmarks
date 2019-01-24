@@ -1,0 +1,15 @@
+;;;; Emacs Bookmark Format Version 1 ;;;;
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("Use of ProtoFactory"
+ (filename . "~/go/src/github.atl.pdrop.net/IVR/ivr-auth/api_service/api/call_correlation.go")
+ (front-context-string . "	apiFactory := p")
+ (rear-context-string . "orrelationUrl)\n\n")
+ (position . 658))
+("ivr-auth"
+ (filename . "~/go/src/github.atl.pdrop.net/IVR/ivr-auth/")
+ (front-context-string . ".git\n  -rw-r--r-")
+ (rear-context-string . "10 Oct 30 23:06 ")
+ (position . 315))
+)
