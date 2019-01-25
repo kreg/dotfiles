@@ -403,6 +403,11 @@
   :config (load "~/src/pdrestclient.el.tokens/tokens.el" 'noerror)
   :load-path (lambda () (list (pdrestclient-load-path))))
 
+(use-package projectile
+  :ensure t
+  :config
+  (projectile-mode +1))
+
 (use-package protobuf-mode
   :ensure t
   :config
