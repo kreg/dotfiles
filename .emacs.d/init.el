@@ -82,10 +82,6 @@
     (concat (getenv "HOME") "/src/markdown-preview/")))
 
 (eval-and-compile
-  (defun godoctor-load-path ()
-    (concat (getenv "HOME") "/src/godoctor.el/")))
-
-(eval-and-compile
   (defun pdrestclient-load-path ()
     (concat (getenv "HOME") "/src/pdrestclient.el/")))
 
@@ -108,6 +104,12 @@
 (use-package company
   :ensure t
   :bind (("C-M-i" . company-complete)))
+
+(use-package company-lsp
+  :ensure t
+  :after (company lsp-mode)
+  :config
+  (add-to-list 'company-backends 'company-lsp))
 
 (use-package company-go
   :ensure t)
@@ -199,16 +201,16 @@
   (add-hook 'ruby-mode-hook 'flycheck-mode)
   (add-hook 'python-mode-hook 'flycheck-mode))
 
-(use-package flycheck-gometalinter
-  :ensure t
-  :after go-mode
-  :config
-  (eval-after-load 'flycheck
-    '(add-hook 'flycheck-mode-hook #'flycheck-gometalinter-setup))
-  (setq flycheck-gometalinter-vendor t)
-  (setq flycheck-gometalinter-fast t)
-  (setq flycheck-gometalinter-tests t)
-  (add-hook 'go-mode-hook #'flycheck-mode))
+;; (use-package flycheck-gometalinter
+;;   :ensure t
+;;   :after go-mode
+;;   :config
+;;   (eval-after-load 'flycheck
+;;     '(add-hook 'flycheck-mode-hook #'flycheck-gometalinter-setup))
+;;   (setq flycheck-gometalinter-vendor t)
+;;   (setq flycheck-gometalinter-fast t)
+;;   (setq flycheck-gometalinter-tests t)
+;;   (add-hook 'go-mode-hook #'flycheck-mode))
 
 (use-package flx
   :ensure t
@@ -233,41 +235,14 @@
   :ensure t
   )
 
-(use-package go-dlv
-  :ensure t)
-
 (use-package go-mode
   :ensure t
   :config
   (when (eq system-type 'darwin)
     (setenv "GOROOT" "/usr/local/opt/go/libexec")
     (setenv "GOPATH" "/Users/cmcdaniel/go"))
-  (setq gofmt-command "goimports")
-  (setq gofmt-args '("-local" "github.atl.pdrop.net"))
-  (use-package go-dlv :ensure t)
-  (use-package go-rename :ensure t)
-  (use-package go-guru
-    :ensure t
-    :config
-    (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode))
-  (setq go-guru-build-tags '("servicetest" "service"))
   (add-hook 'go-mode-hook (lambda()
-                            (company-mode)
-                            (add-to-list 'company-backends 'company-go)
-                            (setq tab-width 4)
-                            (add-hook 'before-save-hook #'gofmt-before-save nil 'local)
-	                    (set (make-local-variable 'compile-command) (concat go-command " run *.go"))))
-  :bind (("C-c C-r" . go-remove-unused-imports)
-         ("C-c C-k" . godoc)))
-
-(use-package godoctor
-  :load-path (lambda () (list (godoctor-load-path))))
-
-(use-package go-eldoc
-  :after go-mode
-  :ensure t
-  :config
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
+                            (setq tab-width 4))))
 
 (use-package go-playground
   :ensure t)
@@ -326,6 +301,20 @@
 (use-package locate
   :config
   (setq locate-command "~/bin/locate-with-mdfind"))
+
+(use-package lsp-mode
+  :ensure t
+  :hook ((go-mode . lsp))
+  :config
+  (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
+
+(use-package lsp-ui
+  :ensure t
+  :after (lsp-mode)
+  :hook ((lsp-mode . lsp-ui-mode)
+	 (lsp-mode . flycheck-mode))
+  :config
+  (setq lsp-prefer-flymake nil))
 
 (use-package magit
   :ensure t
