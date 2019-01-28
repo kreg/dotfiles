@@ -201,16 +201,13 @@
   (add-hook 'ruby-mode-hook 'flycheck-mode)
   (add-hook 'python-mode-hook 'flycheck-mode))
 
-;; (use-package flycheck-gometalinter
-;;   :ensure t
-;;   :after go-mode
-;;   :config
-;;   (eval-after-load 'flycheck
-;;     '(add-hook 'flycheck-mode-hook #'flycheck-gometalinter-setup))
-;;   (setq flycheck-gometalinter-vendor t)
-;;   (setq flycheck-gometalinter-fast t)
-;;   (setq flycheck-gometalinter-tests t)
-;;   (add-hook 'go-mode-hook #'flycheck-mode))
+(use-package flycheck-gometalinter
+  :ensure t
+  :config
+  (progn (flycheck-gometalinter-setup))
+  (setq flycheck-gometalinter-vendor t)
+  (setq flycheck-gometalinter-fast t)
+  (setq flycheck-gometalinter-test t))
 
 (use-package flx
   :ensure t
@@ -306,6 +303,9 @@
   :ensure t
   :hook ((go-mode . lsp))
   :config
+  (define-key lsp-mode-map (kbd "C-c C-o i") 'lsp-find-implementation)
+  (define-key lsp-mode-map (kbd "C-c C-o j") 'lsp-find-definition)
+  (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
 
 (use-package lsp-ui
@@ -403,10 +403,10 @@
   :config (load "~/src/pdrestclient.el.tokens/tokens.el" 'noerror)
   :load-path (lambda () (list (pdrestclient-load-path))))
 
-(use-package projectile
-  :ensure t
-  :config
-  (projectile-mode +1))
+;; (use-package projectile
+;;   :ensure t
+;;   :config
+;;   (projectile-mode +1))
 
 (use-package protobuf-mode
   :ensure t
