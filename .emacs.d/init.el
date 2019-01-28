@@ -239,7 +239,8 @@
     (setenv "GOROOT" "/usr/local/opt/go/libexec")
     (setenv "GOPATH" "/Users/cmcdaniel/go"))
   (add-hook 'go-mode-hook (lambda()
-                            (setq tab-width 4))))
+                            (setq tab-width 4)
+                            (add-hook 'before-save-hook #'lsp-format-buffer 'local))))
 
 (use-package go-playground
   :ensure t)
