@@ -85,6 +85,10 @@
   (defun pdrestclient-load-path ()
     (concat (getenv "HOME") "/src/pdrestclient.el/")))
 
+(eval-and-compile
+  (defun lsp-python-ms-load-path ()
+    (concat (getenv "HOME") "/src/lsp-python-ms/")))
+
 ;; packages
 
 (use-package ace-jump-mode
@@ -112,9 +116,6 @@
   (add-to-list 'company-backends 'company-lsp))
 
 (use-package company-go
-  :ensure t)
-
-(use-package company-jedi
   :ensure t)
 
 (use-package copyright
@@ -195,11 +196,8 @@
   :ensure t
   :config
   (setq flycheck-emacs-lisp-load-path 'inherit)
-  (setq flycheck-python-flake8-executable "~/.virtualenvs/emacs/bin/flake8")
-  (setq-default flycheck-flake8-maximum-line-length 110)
   (add-hook 'elisp-mode-hook 'flycheck-mode)
-  (add-hook 'ruby-mode-hook 'flycheck-mode)
-  (add-hook 'python-mode-hook 'flycheck-mode))
+  (add-hook 'ruby-mode-hook 'flycheck-mode))
 
 (use-package flycheck-gometalinter
   :ensure t
@@ -238,9 +236,11 @@
   (when (eq system-type 'darwin)
     (setenv "GOROOT" "/usr/local/opt/go/libexec")
     (setenv "GOPATH" "/Users/cmcdaniel/go"))
+  (setq gofmt-command "goimports")
+  (setq gofmt-args '("-local" "github.atl.pdrop.net"))
   (add-hook 'go-mode-hook (lambda()
                             (setq tab-width 4)
-                            (add-hook 'before-save-hook #'lsp-format-buffer 'local))))
+                            (add-hook 'before-save-hook #'gofmt-before-save nil 'local))))
 
 (use-package go-playground
   :ensure t)
@@ -274,23 +274,8 @@
 (use-package ht
   :ensure t)
 
-;; (use-package helm
-;;   :ensure t
-;;   :config
-;;   (require 'helm-config)
-;;   (helm-mode 1)
-;;   (setq helm-mode-fuzzy-match t))
-
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer)))        ; instead of list-buffers
-
-(use-package jedi-core
-  :ensure t
-  :config
-  (add-hook 'python-mode-hook
-            '(lambda()
-               (local-set-key (kbd "M-.") 'jedi:goto-definition)
-               (local-set-key (kbd "C-c C-k") 'jedi:show-doc))))
 
 (use-package js
   :config
@@ -302,12 +287,24 @@
 
 (use-package lsp-mode
   :ensure t
-  :hook ((go-mode . lsp))
+  :hook ((go-mode . lsp)
+         (python-mode . lsp))
   :config
   (define-key lsp-mode-map (kbd "C-c C-o i") 'lsp-find-implementation)
   (define-key lsp-mode-map (kbd "C-c C-o j") 'lsp-find-definition)
   (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
+
+(use-package lsp-python-ms
+  :ensure nil
+  :load-path (lambda () (list (lsp-python-ms-load-path)))
+  :config
+  ;; for dev build of language server
+  (setq lsp-python-ms-dir
+        (expand-file-name "~/src/python-language-server/output/bin/Release/"))
+  ;; for executable of language server
+  (setq lsp-python-ms-executable
+        (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
 
 (use-package lsp-ui
   :ensure t
@@ -404,10 +401,8 @@
   :config (load "~/src/pdrestclient.el.tokens/tokens.el" 'noerror)
   :load-path (lambda () (list (pdrestclient-load-path))))
 
-;; (use-package projectile
-;;   :ensure t
-;;   :config
-;;   (projectile-mode +1))
+(use-package projectile
+  :ensure t)
 
 (use-package protobuf-mode
   :ensure t
@@ -419,17 +414,15 @@
             (lambda () (c-add-style "my-style" my-protobuf-style t))))
 
 (use-package python
+  :requires lsp-python-ms
   :bind (:map python-mode-map
               ("s-[" . python-indent-shift-left)
               ("s-]" . python-indent-shift-right))
   :config
   (defun my-python-hook()
     (setq python-indent-guess-indent-offset nil)
-    (setq python-check-command "~/.virtualenvs/emacs/bin/flake8 --max-line-length=110")
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
-    (setenv "LANG" "en_US.UTF-8")
-    (company-mode)
-    (add-to-list 'company-backends 'company-jedi))
+    (setenv "LANG" "en_US.UTF-8"))
   (add-hook 'python-mode-hook 'my-python-hook))
 
 (use-package rainbow-delimiters
