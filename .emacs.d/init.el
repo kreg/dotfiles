@@ -295,6 +295,12 @@
   (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
 
+
+(defun set-workspace-virtualenv (orig-fun workspace-root)
+  (setq python-shell-interpreter (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory workspace-root) "/bin/python")))
+  (apply orig-fun `(,workspace-root))
+  (setq python-shell-interpreter "python"))
+
 (use-package lsp-python-ms
   :ensure nil
   :load-path (lambda () (list (lsp-python-ms-load-path)))
@@ -305,6 +311,7 @@
   ;; for executable of language server
   (setq lsp-python-ms-executable
         (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
+  ;; (advice-add 'lsp-python-ms--get-python-ver-and-syspath :around #'set-workspace-virtualenv))
 
 (use-package lsp-ui
   :ensure t
