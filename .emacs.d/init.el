@@ -313,6 +313,20 @@
         (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
   ;; (advice-add 'lsp-python-ms--get-python-ver-and-syspath :around #'set-workspace-virtualenv))
 
+(use-package lsp-ui
+  :ensure t
+  :after (lsp-mode)
+  :init
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-sideline-show-code-actions nil)
+  (setq lsp-ui-sideline-show-diagnostics nil)
+  (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-sideline-show-symbol nil)
+  :hook ((lsp-mode . lsp-ui-mode)
+	 (lsp-mode . flycheck-mode))
+  :config
+  (setq lsp-prefer-flymake nil))
+
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status)))
