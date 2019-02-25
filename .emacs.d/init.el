@@ -317,9 +317,9 @@
   :ensure t
   :after (lsp-mode)
   :init
-  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-doc-enable nil)
   (setq lsp-ui-sideline-show-code-actions nil)
-  (setq lsp-ui-sideline-show-diagnostics nil)
+  ;; (setq lsp-ui-sideline-show-diagnostics nil)
   (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-show-symbol nil)
   :hook ((lsp-mode . lsp-ui-mode)
