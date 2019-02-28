@@ -115,9 +115,6 @@
   :config
   (add-to-list 'company-backends 'company-lsp))
 
-(use-package company-go
-  :ensure t)
-
 (use-package copyright
   :config
   (setq copyright-year-ranges t)
@@ -190,7 +187,9 @@
   (setq safe-local-variable-values
         '((encoding . utf-8)
           (python-check-command . "~/.virtualenvs/emacs-python3/bin/flake8 --max-line-length=110")
-          (flycheck-python-flake8-executable . "~/.virtualenvs/emacs-python3/bin/flake8"))))
+          (flycheck-python-flake8-executable . "~/.virtualenvs/emacs-python3/bin/flake8")))
+  (add-hook 'hack-local-variables-hook
+            (lambda () (when (derived-mode-p 'python-mode) (lsp)))))
 
 (use-package flycheck
   :ensure t
@@ -287,19 +286,22 @@
 
 (use-package lsp-mode
   :ensure t
-  :hook ((go-mode . lsp)
-         (python-mode . lsp))
+  :hook ((go-mode . lsp))
   :config
   (define-key lsp-mode-map (kbd "C-c C-o i") 'lsp-find-implementation)
   (define-key lsp-mode-map (kbd "C-c C-o j") 'lsp-find-definition)
   (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
+  ;; (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
-
 
 (defun set-workspace-virtualenv (orig-fun workspace-root)
   (setq python-shell-interpreter (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory workspace-root) "/bin/python")))
   (apply orig-fun `(,workspace-root))
   (setq python-shell-interpreter "python"))
+
+(defun set-workspace-python ()
+  (interactive)
+  (setq-local exec-path (cons (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory (directory-file-name default-directory)) "/bin")) exec-path)))
 
 (use-package lsp-python-ms
   :ensure nil
@@ -435,7 +437,9 @@
   (defun my-python-hook()
     (setq python-indent-guess-indent-offset nil)
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
-    (setenv "LANG" "en_US.UTF-8"))
+    (setenv "LANG" "en_US.UTF-8")
+    (setq-local exec-path (cons (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory (directory-file-name (projectile-project-root))) "/bin")) exec-path)))
+    ;; (setq-local exec-path (cons (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory (directory-file-name (lsp-workspace-root))) "/bin")) exec-path)))
   (add-hook 'python-mode-hook 'my-python-hook))
 
 (use-package rainbow-delimiters
