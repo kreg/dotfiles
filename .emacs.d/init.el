@@ -184,10 +184,6 @@
   (when (eq system-type 'darwin)
     (setq insert-directory-program "/usr/local/bin/gls")) ; use gnu ls which supports --dired
   (setq require-final-newline t)
-  (setq safe-local-variable-values
-        '((encoding . utf-8)
-          (python-check-command . "~/.virtualenvs/emacs-python3/bin/flake8 --max-line-length=110")
-          (flycheck-python-flake8-executable . "~/.virtualenvs/emacs-python3/bin/flake8")))
   (add-hook 'hack-local-variables-hook
             (lambda () (when (derived-mode-p 'python-mode) (lsp)))))
 
@@ -294,15 +290,6 @@
   ;; (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
 
-(defun set-workspace-virtualenv (orig-fun workspace-root)
-  (setq python-shell-interpreter (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory workspace-root) "/bin/python")))
-  (apply orig-fun `(,workspace-root))
-  (setq python-shell-interpreter "python"))
-
-(defun set-workspace-python ()
-  (interactive)
-  (setq-local exec-path (cons (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory (directory-file-name default-directory)) "/bin")) exec-path)))
-
 (use-package lsp-python-ms
   :ensure nil
   :load-path (lambda () (list (lsp-python-ms-load-path)))
@@ -313,7 +300,6 @@
   ;; for executable of language server
   (setq lsp-python-ms-executable
         (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
-  ;; (advice-add 'lsp-python-ms--get-python-ver-and-syspath :around #'set-workspace-virtualenv))
 
 (use-package lsp-ui
   :ensure t
@@ -437,9 +423,7 @@
   (defun my-python-hook()
     (setq python-indent-guess-indent-offset nil)
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
-    (setenv "LANG" "en_US.UTF-8")
-    (setq-local exec-path (cons (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory (directory-file-name (projectile-project-root))) "/bin")) exec-path)))
-    ;; (setq-local exec-path (cons (expand-file-name (concat "~/.virtualenvs/" (file-name-nondirectory (directory-file-name (lsp-workspace-root))) "/bin")) exec-path)))
+    (setenv "LANG" "en_US.UTF-8"))
   (add-hook 'python-mode-hook 'my-python-hook))
 
 (use-package rainbow-delimiters
@@ -550,4 +534,4 @@
 
 (defun safe-local-variable-p (sym val)
   "Put your guard logic here, return t when sym is ok, nil otherwise"
-  (member sym '(flycheck-python-flake8-executable python-check-command encoding org-confirm-babel-evaluate)))
+  (member sym '(exec-path encoding org-confirm-babel-evaluate)))
