@@ -185,7 +185,9 @@
     (setq insert-directory-program "/usr/local/bin/gls")) ; use gnu ls which supports --dired
   (setq require-final-newline t)
   (add-hook 'hack-local-variables-hook
-            (lambda () (when (derived-mode-p 'python-mode) (lsp)))))
+            (lambda () (when (derived-mode-p 'python-mode)
+                         (venv-workon venv-name)
+                         (lsp)))))
 
 (use-package flycheck
   :ensure t
@@ -270,6 +272,8 @@
   :ensure t)
 
 (use-package ibuffer
+  :config
+  (setq ibuffer-default-sorting-mode 'filename/process)
   :bind (("C-x C-b" . ibuffer)))        ; instead of list-buffers
 
 (use-package js
@@ -284,10 +288,11 @@
   :ensure t
   :hook ((go-mode . lsp))
   :config
+  (setenv "GO111module" "off")
   (define-key lsp-mode-map (kbd "C-c C-o i") 'lsp-find-implementation)
   (define-key lsp-mode-map (kbd "C-c C-o j") 'lsp-find-definition)
   (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
-  ;; (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
+  (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
 
 (use-package lsp-python-ms
@@ -439,7 +444,9 @@
 
 (use-package rust-mode
   :ensure t
+  :hook (rust-mode . lsp)
   :config
+  (add-hook 'rust-mode-hook #'rust-enable-format-on-save)
   (setq rust-format-on-save t))
 
 (use-package cargo
@@ -500,6 +507,9 @@
   :config
   (setq uniquify-buffer-name-style 'forward))
 
+(use-package virtualenvwrapper
+  :ensure t)
+
 (use-package windmove
   :ensure t
   :config
@@ -534,4 +544,4 @@
 
 (defun safe-local-variable-p (sym val)
   "Put your guard logic here, return t when sym is ok, nil otherwise"
-  (member sym '(exec-path encoding org-confirm-babel-evaluate)))
+  (member sym '(exec-path encoding org-confirm-babel-evaluate lexical-binding venv-name)))
