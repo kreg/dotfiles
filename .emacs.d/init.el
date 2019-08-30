@@ -196,14 +196,6 @@
   (add-hook 'elisp-mode-hook 'flycheck-mode)
   (add-hook 'ruby-mode-hook 'flycheck-mode))
 
-(use-package flycheck-gometalinter
-  :ensure t
-  :config
-  (progn (flycheck-gometalinter-setup))
-  (setq flycheck-gometalinter-vendor t)
-  (setq flycheck-gometalinter-fast t)
-  (setq flycheck-gometalinter-test t))
-
 (use-package flx
   :ensure t
   :init
@@ -233,6 +225,9 @@
   (when (eq system-type 'darwin)
     (setenv "GOROOT" "/usr/local/opt/go/libexec")
     (setenv "GOPATH" "/Users/cmcdaniel/go"))
+
+  ;; note: we duplicate the use of goimports in lsp-mode to make the lsp-format-buffer command work. But it is
+  ;; much slower than calling goimports locally, so we'll use that for our before-save-hook.
   (setq gofmt-command "goimports")
   (setq gofmt-args '("-local" "github.atl.pdrop.net"))
   (add-hook 'go-mode-hook (lambda()
@@ -286,7 +281,8 @@
 
 (use-package lsp-mode
   :ensure t
-  :hook ((go-mode . lsp))
+  :hook ((go-mode . lsp)
+         (rust-mode . lsp))
   :config
   (setenv "GO111module" "off")
   (define-key lsp-mode-map (kbd "C-c C-o i") 'lsp-find-implementation)
@@ -444,7 +440,6 @@
 
 (use-package rust-mode
   :ensure t
-  :hook (rust-mode . lsp)
   :config
   (add-hook 'rust-mode-hook #'rust-enable-format-on-save)
   (setq rust-format-on-save t))
@@ -461,13 +456,6 @@
 (use-package rust-playground
   :ensure t
   :after (rust-mode))
-
-(use-package flycheck-rust
-  :ensure t
-  :after (flycheck rust-mode)
-  :config
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-  (add-hook 'rust-mode-hook #'flycheck-mode))
 
 (use-package scroll-bar
   :config
