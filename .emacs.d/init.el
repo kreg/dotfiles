@@ -82,12 +82,12 @@
     (concat (getenv "HOME") "/src/markdown-preview/")))
 
 (eval-and-compile
-  (defun godoctor-load-path ()
-    (concat (getenv "HOME") "/src/godoctor.el/")))
-
-(eval-and-compile
   (defun pdrestclient-load-path ()
     (concat (getenv "HOME") "/src/pdrestclient.el/")))
+
+(eval-and-compile
+  (defun lsp-python-ms-load-path ()
+    (concat (getenv "HOME") "/src/lsp-python-ms/")))
 
 ;; packages
 
@@ -100,6 +100,11 @@
   :ensure t
   :bind (("M-p" . ace-window)))
 
+(use-package afternoon-theme
+  :ensure t
+  :config
+  (load-theme 'afternoon t))
+
 (use-package beacon
   :ensure t
   :config
@@ -109,11 +114,11 @@
   :ensure t
   :bind (("C-M-i" . company-complete)))
 
-(use-package company-go
-  :ensure t)
-
-(use-package company-jedi
-  :ensure t)
+(use-package company-lsp
+  :ensure t
+  :after (company lsp-mode)
+  :config
+  (add-to-list 'company-backends 'company-lsp))
 
 (use-package copyright
   :config
@@ -184,31 +189,17 @@
   (when (eq system-type 'darwin)
     (setq insert-directory-program "/usr/local/bin/gls")) ; use gnu ls which supports --dired
   (setq require-final-newline t)
-  (setq safe-local-variable-values
-        '((encoding . utf-8)
-          (python-check-command . "~/.virtualenvs/emacs-python3/bin/flake8 --max-line-length=110")
-          (flycheck-python-flake8-executable . "~/.virtualenvs/emacs-python3/bin/flake8"))))
+  (add-hook 'hack-local-variables-hook
+            (lambda () (when (derived-mode-p 'python-mode)
+                         (venv-workon venv-name)
+                         (lsp)))))
 
 (use-package flycheck
   :ensure t
   :config
   (setq flycheck-emacs-lisp-load-path 'inherit)
-  (setq flycheck-python-flake8-executable "~/.virtualenvs/emacs/bin/flake8")
-  (setq-default flycheck-flake8-maximum-line-length 110)
   (add-hook 'elisp-mode-hook 'flycheck-mode)
-  (add-hook 'ruby-mode-hook 'flycheck-mode)
-  (add-hook 'python-mode-hook 'flycheck-mode))
-
-(use-package flycheck-gometalinter
-  :ensure t
-  :after go-mode
-  :config
-  (eval-after-load 'flycheck
-    '(add-hook 'flycheck-mode-hook #'flycheck-gometalinter-setup))
-  (setq flycheck-gometalinter-vendor t)
-  (setq flycheck-gometalinter-fast t)
-  (setq flycheck-gometalinter-tests t)
-  (add-hook 'go-mode-hook #'flycheck-mode))
+  (add-hook 'ruby-mode-hook 'flycheck-mode))
 
 (use-package flx
   :ensure t
@@ -233,41 +224,20 @@
   :ensure t
   )
 
-(use-package go-dlv
-  :ensure t)
-
 (use-package go-mode
   :ensure t
   :config
   (when (eq system-type 'darwin)
     (setenv "GOROOT" "/usr/local/opt/go/libexec")
     (setenv "GOPATH" "/Users/cmcdaniel/go"))
+
+  ;; note: we duplicate the use of goimports in lsp-mode to make the lsp-format-buffer command work. But it is
+  ;; much slower than calling goimports locally, so we'll use that for our before-save-hook.
   (setq gofmt-command "goimports")
   (setq gofmt-args '("-local" "github.atl.pdrop.net"))
-  (use-package go-dlv :ensure t)
-  (use-package go-rename :ensure t)
-  (use-package go-guru
-    :ensure t
-    :config
-    (add-hook 'go-mode-hook #'go-guru-hl-identifier-mode))
-  (setq go-guru-build-tags '("servicetest" "service"))
   (add-hook 'go-mode-hook (lambda()
-                            (company-mode)
-                            (add-to-list 'company-backends 'company-go)
                             (setq tab-width 4)
-                            (add-hook 'before-save-hook #'gofmt-before-save nil 'local)
-	                    (set (make-local-variable 'compile-command) (concat go-command " run *.go"))))
-  :bind (("C-c C-r" . go-remove-unused-imports)
-         ("C-c C-k" . godoc)))
-
-(use-package godoctor
-  :load-path (lambda () (list (godoctor-load-path))))
-
-(use-package go-eldoc
-  :after go-mode
-  :ensure t
-  :config
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
+                            (add-hook 'before-save-hook #'gofmt-before-save nil 'local))))
 
 (use-package go-playground
   :ensure t)
@@ -301,23 +271,10 @@
 (use-package ht
   :ensure t)
 
-;; (use-package helm
-;;   :ensure t
-;;   :config
-;;   (require 'helm-config)
-;;   (helm-mode 1)
-;;   (setq helm-mode-fuzzy-match t))
-
 (use-package ibuffer
-  :bind (("C-x C-b" . ibuffer)))        ; instead of list-buffers
-
-(use-package jedi-core
-  :ensure t
   :config
-  (add-hook 'python-mode-hook
-            '(lambda()
-               (local-set-key (kbd "M-.") 'jedi:goto-definition)
-               (local-set-key (kbd "C-c C-k") 'jedi:show-doc))))
+  (setq ibuffer-default-sorting-mode 'filename/process)
+  :bind (("C-x C-b" . ibuffer)))        ; instead of list-buffers
 
 (use-package js
   :config
@@ -326,6 +283,46 @@
 (use-package locate
   :config
   (setq locate-command "~/bin/locate-with-mdfind"))
+
+(use-package lsp-mode
+  :ensure t
+  :hook ((go-mode . lsp)
+         (rust-mode . lsp))
+  :config
+  (setenv "GO111module" "off")
+  (define-key lsp-mode-map (kbd "C-c C-o i") 'lsp-find-implementation)
+  (define-key lsp-mode-map (kbd "C-c C-o j") 'lsp-find-definition)
+  (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
+  (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
+  (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
+
+(use-package lsp-python-ms
+  :ensure nil
+  :load-path (lambda () (list (lsp-python-ms-load-path)))
+  :config
+  ;; for dev build of language server
+  (setq lsp-python-ms-dir
+        (expand-file-name "~/src/python-language-server/output/bin/Release/"))
+  ;; for executable of language server
+  (setq lsp-python-ms-executable
+        (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
+
+(use-package lsp-ui
+  :ensure t
+  :after (lsp-mode)
+  :init
+ ;; (setq lsp-ui-doc-alignment (quote window))
+ (setq lsp-ui-doc-position (quote bottom))
+  ;; (setq lsp-ui-doc-enable nil)
+  ;; (setq lsp-ui-sideline-show-code-actions nil)
+  ;; (setq lsp-ui-sideline-show-diagnostics nil)
+  ;; (setq lsp-ui-sideline-show-hover nil)
+  ;; (setq lsp-ui-sideline-show-symbol nil)
+  :hook ((lsp-mode . lsp-ui-mode)
+	 (lsp-mode . flycheck-mode))
+  :config
+  (setq lsp-prefer-flymake nil)
+  (set-face-background 'lsp-ui-doc-background "dark slate blue"))
 
 (use-package magit
   :ensure t
@@ -341,8 +338,8 @@
 
 (use-package material-theme
   :ensure t
-  :config
-  (load-theme 'material t))
+  :config)
+  ;; (load-theme 'material t))
 
 (defun multi-term-split-window-right ()
   (interactive)
@@ -414,6 +411,9 @@
   :config (load "~/src/pdrestclient.el.tokens/tokens.el" 'noerror)
   :load-path (lambda () (list (pdrestclient-load-path))))
 
+(use-package projectile
+  :ensure t)
+
 (use-package protobuf-mode
   :ensure t
   :config
@@ -424,17 +424,15 @@
             (lambda () (c-add-style "my-style" my-protobuf-style t))))
 
 (use-package python
+  :requires lsp-python-ms
   :bind (:map python-mode-map
               ("s-[" . python-indent-shift-left)
               ("s-]" . python-indent-shift-right))
   :config
   (defun my-python-hook()
     (setq python-indent-guess-indent-offset nil)
-    (setq python-check-command "~/.virtualenvs/emacs/bin/flake8 --max-line-length=110")
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
-    (setenv "LANG" "en_US.UTF-8")
-    (company-mode)
-    (add-to-list 'company-backends 'company-jedi))
+    (setenv "LANG" "en_US.UTF-8"))
   (add-hook 'python-mode-hook 'my-python-hook))
 
 (use-package rainbow-delimiters
@@ -451,6 +449,7 @@
 (use-package rust-mode
   :ensure t
   :config
+  (add-hook 'rust-mode-hook #'rust-enable-format-on-save)
   (setq rust-format-on-save t))
 
 (use-package cargo
@@ -465,13 +464,6 @@
 (use-package rust-playground
   :ensure t
   :after (rust-mode))
-
-(use-package flycheck-rust
-  :ensure t
-  :after (flycheck rust-mode)
-  :config
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-  (add-hook 'rust-mode-hook #'flycheck-mode))
 
 (use-package scroll-bar
   :config
@@ -511,6 +503,9 @@
   :config
   (setq uniquify-buffer-name-style 'forward))
 
+(use-package virtualenvwrapper
+  :ensure t)
+
 (use-package windmove
   :ensure t
   :config
@@ -545,4 +540,4 @@
 
 (defun safe-local-variable-p (sym val)
   "Put your guard logic here, return t when sym is ok, nil otherwise"
-  (member sym '(flycheck-python-flake8-executable python-check-command encoding org-confirm-babel-evaluate)))
+  (member sym '(exec-path encoding org-confirm-babel-evaluate lexical-binding venv-name)))
