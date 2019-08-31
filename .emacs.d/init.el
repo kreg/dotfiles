@@ -100,6 +100,11 @@
   :ensure t
   :bind (("M-p" . ace-window)))
 
+(use-package afternoon-theme
+  :ensure t
+  :config
+  (load-theme 'afternoon t))
+
 (use-package beacon
   :ensure t
   :config
@@ -306,15 +311,18 @@
   :ensure t
   :after (lsp-mode)
   :init
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-sideline-show-code-actions nil)
+ ;; (setq lsp-ui-doc-alignment (quote window))
+ (setq lsp-ui-doc-position (quote bottom))
+  ;; (setq lsp-ui-doc-enable nil)
+  ;; (setq lsp-ui-sideline-show-code-actions nil)
   ;; (setq lsp-ui-sideline-show-diagnostics nil)
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-sideline-show-symbol nil)
+  ;; (setq lsp-ui-sideline-show-hover nil)
+  ;; (setq lsp-ui-sideline-show-symbol nil)
   :hook ((lsp-mode . lsp-ui-mode)
 	 (lsp-mode . flycheck-mode))
   :config
-  (setq lsp-prefer-flymake nil))
+  (setq lsp-prefer-flymake nil)
+  (set-face-background 'lsp-ui-doc-background "dark slate blue"))
 
 (use-package magit
   :ensure t
@@ -330,8 +338,8 @@
 
 (use-package material-theme
   :ensure t
-  :config
-  (load-theme 'material t))
+  :config)
+  ;; (load-theme 'material t))
 
 (defun multi-term-split-window-right ()
   (interactive)
