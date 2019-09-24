@@ -311,8 +311,6 @@
   :ensure t
   :after (lsp-mode)
   :init
- ;; (setq lsp-ui-doc-alignment (quote window))
- (setq lsp-ui-doc-position (quote bottom))
   ;; (setq lsp-ui-doc-enable nil)
   ;; (setq lsp-ui-sideline-show-code-actions nil)
   ;; (setq lsp-ui-sideline-show-diagnostics nil)
