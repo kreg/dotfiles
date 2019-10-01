@@ -85,9 +85,9 @@
   (defun pdrestclient-load-path ()
     (concat (getenv "HOME") "/src/pdrestclient.el/")))
 
-(eval-and-compile
-  (defun lsp-python-ms-load-path ()
-    (concat (getenv "HOME") "/src/lsp-python-ms/")))
+;; (eval-and-compile
+;;   (defun lsp-python-ms-load-path ()
+;;     (concat (getenv "HOME") "/src/lsp-python-ms/")))
 
 ;; packages
 
@@ -191,7 +191,7 @@
   (setq require-final-newline t)
   (add-hook 'hack-local-variables-hook
             (lambda () (when (derived-mode-p 'python-mode)
-                         (venv-workon venv-name)
+                         (pyvenv-workon venv-name)
                          (lsp)))))
 
 (use-package flycheck
@@ -287,6 +287,7 @@
 (use-package lsp-mode
   :ensure t
   :hook ((go-mode . lsp)
+         (python-mode . lsp)
          (rust-mode . lsp))
   :config
   (setenv "GO111module" "off")
@@ -296,16 +297,16 @@
   (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
 
-(use-package lsp-python-ms
-  :ensure nil
-  :load-path (lambda () (list (lsp-python-ms-load-path)))
-  :config
-  ;; for dev build of language server
-  (setq lsp-python-ms-dir
-        (expand-file-name "~/src/python-language-server/output/bin/Release/"))
-  ;; for executable of language server
-  (setq lsp-python-ms-executable
-        (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
+;; (use-package lsp-python-ms
+;;   :ensure nil
+;;   :load-path (lambda () (list (lsp-python-ms-load-path)))
+;;   :config
+;;   ;; for dev build of language server
+;;   (setq lsp-python-ms-dir
+;;         (expand-file-name "~/src/python-language-server/output/bin/Release/"))
+;;   ;; for executable of language server
+;;   (setq lsp-python-ms-executable
+;;         (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
 
 (use-package lsp-ui
   :ensure t
@@ -422,7 +423,7 @@
             (lambda () (c-add-style "my-style" my-protobuf-style t))))
 
 (use-package python
-  :requires lsp-python-ms
+  ;; :requires lsp-python-ms
   :bind (:map python-mode-map
               ("s-[" . python-indent-shift-left)
               ("s-]" . python-indent-shift-right))
@@ -432,6 +433,9 @@
     (modify-syntax-entry ?_ "w")         ; Make underscores part of a word
     (setenv "LANG" "en_US.UTF-8"))
   (add-hook 'python-mode-hook 'my-python-hook))
+
+(use-package pyvenv
+  :ensure t)
 
 (use-package rainbow-delimiters
   :ensure t
@@ -500,9 +504,6 @@
 (use-package uniquify
   :config
   (setq uniquify-buffer-name-style 'forward))
-
-(use-package virtualenvwrapper
-  :ensure t)
 
 (use-package windmove
   :ensure t
