@@ -497,8 +497,14 @@
          ([f8] . smex)
          ("M-X" . smex-major-mode-commands)))
 
+(use-package terraform-mode
+  :ensure t
+  :config (add-to-list 'auto-mode-alist '("\\.tf\\'" . terraform-mode)))
+
 (use-package time
   :config
+  (setq display-time-day-and-date t)
+  (setq display-time-default-load-average nil)
   (display-time-mode 1))
 
 (use-package uniquify
