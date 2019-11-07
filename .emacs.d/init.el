@@ -85,10 +85,6 @@
   (defun pdrestclient-load-path ()
     (concat (getenv "HOME") "/src/pdrestclient.el/")))
 
-;; (eval-and-compile
-;;   (defun lsp-python-ms-load-path ()
-;;     (concat (getenv "HOME") "/src/lsp-python-ms/")))
-
 ;; packages
 
 (use-package ace-jump-mode
@@ -296,17 +292,6 @@
   (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
   (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
   (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
-
-;; (use-package lsp-python-ms
-;;   :ensure nil
-;;   :load-path (lambda () (list (lsp-python-ms-load-path)))
-;;   :config
-;;   ;; for dev build of language server
-;;   (setq lsp-python-ms-dir
-;;         (expand-file-name "~/src/python-language-server/output/bin/Release/"))
-;;   ;; for executable of language server
-;;   (setq lsp-python-ms-executable
-;;         (expand-file-name "~/src/python-language-server/output/bin/Release/osx-x64/publish/Microsoft.Python.LanguageServer")))
 
 (use-package lsp-ui
   :ensure t
