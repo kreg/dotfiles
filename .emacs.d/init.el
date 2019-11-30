@@ -50,6 +50,15 @@
   (switch-to-buffer (get-buffer-create "*scratch*"))
   (lisp-interaction-mode))
 
+(defun switch-to-minibuffer ()
+  "Switch to minibuffer window."
+  (interactive)
+  (if (active-minibuffer-window)
+      (select-window (active-minibuffer-window))
+    (error "Minibuffer is not active")))
+
+(global-set-key "\C-co" 'switch-to-minibuffer) ;; Bind to `C-c o'
+
 (defun now ()
   "Insert string for the current time formatted like '2:34 PM'."
   (interactive)                 ; permit invocation in minibuffer
