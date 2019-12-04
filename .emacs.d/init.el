@@ -299,8 +299,9 @@
   (define-key lsp-mode-map (kbd "C-c C-o i") 'lsp-find-implementation)
   (define-key lsp-mode-map (kbd "C-c C-o j") 'lsp-find-definition)
   (define-key lsp-mode-map (kbd "C-c C-o r") 'lsp-find-references)
-  (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
-  (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net"))
+  ;; (setq lsp-clients-go-server-args '("-build-tags" "servicetest service"))
+  (setq lsp-clients-go-imports-local-prefix "github.atl.pdrop.net")
+  (setq lsp-gopls-build-flags ["-tags" "servicetest service"]))
 
 (use-package lsp-ui
   :ensure t
