@@ -328,7 +328,8 @@
   (setq markdown-command "~/.virtualenvs/emacs/bin/markdown_py -x mdx_gfm"))
 
 (use-package markdown-preview
-  :load-path (lambda () (list (markdown-preview-load-path))))
+  :load-path (lambda () (list (markdown-preview-load-path)))
+  :commands (mp-preview))
 
 (use-package material-theme
   :ensure t
